@@ -1,16 +1,17 @@
 #!/bin/bash
 
+cd "$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
 . load_config.sh
 
 # Define the path to the container and conda env
-CONT="${ENV['path']}"
-PYENV="${ENV['python']}"
+CONT="${ENV['cont']}"
 
 # Parse the incoming command
 COMMAND="$@"
 
 # Enter the container and run the command
-SING="${ENV['exec']} exec --nv"
+SING="${ENV['path']} exec --nv"
 mounts=(${ENV[mounts]})
 BS=""
 for i in "${mounts[@]}";do
@@ -19,6 +20,22 @@ for i in "${mounts[@]}";do
     fi
 done
 
-${SING} ${BS} ${CONT} bash -c "source activate ${PWD}/${ENV[python]} \
+# expose these paths under `/${path}`
+for i in "${!PATHS[@]}"
+do
+  BS="${BS} -B ${PATHS[$i]}:/$i"
+done
+
+# add the repo path to "/project"
+BS="${BS} -B ${PWD}:/project"
+
+
+$SING $BS $CONT bash -c "source activate ${PWD}/${ENV[pyenv]} \
+        # && export JULIA_PROJECT=${PWD} \
+        && export TMPDIR=${PATHS[tmp]} \
+        && export PYTHON=/project/${ENV[pyenv]}/bin/python3 \
+        # && export JULIA_DEPOT_PATH=/project/${ENV[julia_depot]} \
+        # && export PYCALL_JL_RUNTIME_PYTHON=/project/${ENV[pyenv]}/bin/python3 \
+        && cd $PWD \
         && exec $COMMAND \
-        && source deactivate"
+        && deactivate"

@@ -1,41 +1,48 @@
 #!/bin/bash
 
-# This script will setup the project environment
-
-# Change any of these values as you see fit.
-# For initial run, all should be set to true.
-BUILDCONT=true
-BUILDPENV=true
-
 . load_config.sh
 
-# Define the path to the container
-CONT="${ENV['path']}"
+usage="$(basename "$0") [targets...] -- setup an environmental component of the project according to [default|local].conf
+supported targets:
+    cont_[pull|build] : either pull the singularity container or build from scratch
+    python : build the python environment
+    julia : build julia environment
+"
 
-# 1) Create the singularity container (requires sudo)
-if [ $BUILDCONT = true ]; then
-    if [ -f "$CONT" ]; then
-        echo "Older container found...removing"
-        rm -f "$CONT"
-    fi
-    echo "Building container..."
-    if [ ! -f "blender.tar.bz2" ]; then
-        wget "https://www.dropbox.com/s/3f39ste5xh6rjkt/blender.tar.bz2?dl=0" -O "blender.tar.bz2"
-    fi
-    sudo ${ENV['exec']} build $CONT Singularity
-else
-    echo "Not building container at ${CONT}"
-fi
+cont_pull_url="TODO"
+SING="${ENV['path']}"
 
-# Initializes python env
-if [ $BUILDPENV = true ]; then
-    ${ENV['exec']} exec $CONT bash <<EOF
-    if [ ! -d ${ENV[python]} ]; then
-       yes | conda create -p ${ENV[python]} python=3.6
-    fi
-    source activate ${PWD}/${ENV[python]}
-    python3 -m pip install -r requirements.txt
-    python3 -m pip install -e .
-    source deactivate
-EOF
-fi
+[ $# -eq 0 ] || [[ "${@}" =~ "help" ]] && echo "$usage"
+
+# container setup
+[[ "${@}" =~ "cont_build" ]] || [[ "${@}" =~ "cont_pull" ]] || echo "Not touching container"
+[[ "${@}" =~ "cont_pull" ]] && echo "pulling container" && \
+    wget "$cont_pull_url" -O "${ENV[cont]}"
+[[ "${@}" =~ "cont_build" ]] && echo "building container" && \
+    SINGULARITY_TMPDIR=/var/tmp sudo -E $SING build "${ENV[cont]}" "${ENV[build]}"
+
+
+# python setup
+[[ "${@}" =~ "python" ]] || echo "Not touching python"
+[[ "${@}" =~ "python" ]] && echo "building python env" && \
+    singularity exec ${ENV[cont]} bash -c "yes | conda create -p $PWD/${ENV[pyenv]} python=3.8" && \
+    ./run.sh python -m pip install -r requirements.txt
+
+# julia setup
+[[ "${@}" =~ "julia" ]] || echo "Not touching julia"
+[[ "${@}" =~ "julia" ]] && echo "building julia env" && \
+    ./run.sh julia -e '"using Pkg; Pkg.instantiate();"'
+
+# datasets
+# none yet
+[[ "${@}" =~ "datasets" ]] || [[ "${@}" =~ "datasets" ]] || echo "Not touching datasets"
+# [[ "${@}" =~ "datasets" ]] && echo "pulling datasets" && \
+#     echo "pulling datasets" && \
+#     # fill in here
+
+# checkpoints
+# none yet
+[[ "${@}" =~ "checkpoints" ]] || [[ "${@}" =~ "checkpoints" ]] || echo "Not touching checkpoints"
+# [[ "${@}" =~ "checkpoints" ]] && echo "pulling checkpoints" && \
+#     echo "pulling checkpoints" && \
+#     # fill in here
