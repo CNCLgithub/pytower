@@ -21,8 +21,6 @@ from blockworld.utils import json_encoders
 
 from pytower.render import interface
 
-from pytower.utils import Config
-CONFIG = Config()
 
 def get_data(tower_path):
     """Gets a given trial info from disk
@@ -72,9 +70,9 @@ def main():
         out = '{0!s}_rendered'.format(os.path.dirname(args.src))
     else:
         # Otherwise save in `renders` destination
-        src = os.path.join(CONFIG['PATHS', 'towers'], args.src)
+        src = os.path.join('/scenes/', args.src)
         src = glob.glob(os.path.join(src, '*.json'))
-        out = os.path.join(CONFIG['PATHS', 'renders'], args.src)
+        out = os.path.join('/renders/', args.src)
 
     if not os.path.isdir(out):
         os.mkdir(out)

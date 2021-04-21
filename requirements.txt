@@ -1,10 +1,11 @@
+-e deps/blockworld
 scipy
 pandas
 joblib
 scipy
 pandas
 joblib
-h5py>=2.9.0rc1
+h5py
 pillow
 matplotlib
 SQLAlchemy
@@ -19,4 +20,4 @@ bokeh
 dask_jobqueue
 pybullet
 pyquaternion
--e deps/blockworld
+-e .

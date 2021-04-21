@@ -24,7 +24,7 @@ SING="${ENV['path']}"
 
 # python setup
 [[ "${@}" =~ "python" ]] || echo "Not touching python"
-[[ "${@}" =~ "python" ]] && echo "building python env" && \
+[[ "${@}" =~ "python" ]] && echo "building python env @ $PWD/${ENV[pyenv]}" && \
     singularity exec ${ENV[cont]} bash -c "yes | conda create -p $PWD/${ENV[pyenv]} python=3.8" && \
     ./run.sh python -m pip install -r requirements.txt
 

@@ -33,8 +33,6 @@ from blockworld.utils.json_encoders import TowerEncoder
 from pytower.generator.noisy_gen import PushedSim
 from pytower.generator.simple_gen import SimpleGen
 
-from pytower.utils import Config
-CONFIG = Config()
 
 def evaluate_tower(base, size, gen, phys, pred, out, debug = False):
     """ Encapsulation for searching for interesting towers.
@@ -62,7 +60,7 @@ def evaluate_tower(base, size, gen, phys, pred, out, debug = False):
     # compute stats over towers
     trace, stats, _ = phys.analyze(tower)
     # evaluate metrics
-    print(stats['instability'], stats['instability_mu'])
+    print(stats)
     passed = pred(stats) or debug
     hashed = None
     if passed:
@@ -139,9 +137,9 @@ def main():
     if args.out is None:
         suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
         out_d =  '_'.join(("simple", args.metric, suffix))
-        out_d = os.path.join(CONFIG['PATHS', 'towers'], out_d)
+        out_d = os.path.join('/scenes', out_d)
     else:
-        out_d = os.path.join(CONFIG['PATHS', 'towers'], args.out)
+        out_d = os.path.join('/scenes', args.out)
     print('Saving new towers to {0!s}'.format(out_d))
 
     # Either build tower from scratch or ontop of a base
@@ -245,7 +243,6 @@ def initialize_dask(n, factor = 5, slurm = False):
             'env_extra' : [
                 'JOB_ID=${SLURM_ARRAY_JOB_ID%;*}_${SLURM_ARRAY_TASK_ID%;*}',
                 'source /etc/profile.d/modules.sh',
-                'cd {0!s}'.format(CONFIG['PATHS', 'root']),
             ]
         }
         cluster = SLURMCluster(**params)

@@ -31,11 +31,11 @@ BS="${BS} -B ${PWD}:/project"
 
 
 $SING $BS $CONT bash -c "source activate ${PWD}/${ENV[pyenv]} \
-        # && export JULIA_PROJECT=${PWD} \
+        && export JULIA_PROJECT=${PWD} \
         && export TMPDIR=${PATHS[tmp]} \
         && export PYTHON=/project/${ENV[pyenv]}/bin/python3 \
-        # && export JULIA_DEPOT_PATH=/project/${ENV[julia_depot]} \
-        # && export PYCALL_JL_RUNTIME_PYTHON=/project/${ENV[pyenv]}/bin/python3 \
+        && export JULIA_DEPOT_PATH=/project/${ENV[julia_depot]} \
+        && export PYCALL_JL_RUNTIME_PYTHON=/project/${ENV[pyenv]}/bin/python3 \
         && cd $PWD \
         && exec $COMMAND \
         && deactivate"

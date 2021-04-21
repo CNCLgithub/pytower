@@ -78,9 +78,8 @@ class BlockScene:
         Brings the given object into active context.
         """
         bpy.ops.object.select_all(action='DESELECT')
-        obj.select = True
-        bpy.context.scene.objects.active
-        bpy.context.scene.update()
+        # bpy.context.scene.objects.active
+        # bpy.context.scene.update()
 
 
     def rotate_obj(self, obj, rot):
@@ -90,7 +89,7 @@ class BlockScene:
         self.select_obj(obj)
         obj.rotation_mode = 'QUATERNION'
         obj.rotation_quaternion = np.roll(rot, 1) # [3, 0, 1, 2]
-        bpy.context.scene.update()
+        # bpy.context.scene.update()
 
     def move_obj(self, obj, pos):
         """
@@ -99,7 +98,7 @@ class BlockScene:
         self.select_obj(obj)
         pos = mathutils.Vector(pos)
         obj.location = pos
-        bpy.context.scene.update()
+        # bpy.context.scene.update()
 
     def scale_obj(self, obj, dims):
         """
@@ -107,9 +106,9 @@ class BlockScene:
         """
         self.select_obj(obj)
         obj.dimensions = dims
-        bpy.context.scene.update()
+        # bpy.context.scene.update()
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
-        bpy.context.scene.update()
+        # bpy.context.scene.update()
 
     def set_appearance(self, obj, mat):
         """
@@ -120,15 +119,15 @@ class BlockScene:
         if mat == 'Wood':
             mat = 'rough_wood_{0:d}'.format(1)
         obj.active_material = bpy.data.materials[mat]
-        bpy.context.scene.update()
+        # bpy.context.scene.update()
 
     def create_block(self, object_d, sim, transparent, mutate):
         """
         Initializes a block object.
         """
-        bpy.ops.mesh.primitive_cube_add(location=object_d['data']['pos'],
-                                        view_align=False,
-                                        enter_editmode=False)
+        bpy.ops.mesh.primitive_cube_add(location=object_d['data']['pos'])
+                                        # view_align=False,
+                                        # enter_editmode=False)
         ob = bpy.context.object
         ob.name = '{0:d}_{1:d}'.format(object_d['id'], sim)
         ob.show_name = True
@@ -168,9 +167,7 @@ class BlockScene:
         Creates the table on which the blocks will stand.
         """
         bpy.ops.mesh.primitive_cylinder_add(
-            location = block['pos'],
-            view_align=False,
-            enter_editmode=False)
+            location = block['pos'])
         ob = bpy.context.object
         ob.name = 'base'
         ob.show_name = False
@@ -224,7 +221,7 @@ class BlockScene:
         xyz = [np.cos(rot) * radius, np.sin(rot) * radius, 15]
         camera = bpy.data.objects['Camera']
         camera.location = xyz
-        bpy.context.scene.update()
+        # bpy.context.scene.update()
         # The camera automatically tracks Empty
         camera_track = bpy.data.objects['Empty']
         self.move_obj(camera_track, [0, 0, 5])
@@ -263,7 +260,7 @@ class BlockScene:
         for sim in range(n_sims):
             self._frame_set(sim, frame)
             self.set_camera(rot)
-        bpy.context.scene.update()
+        # bpy.context.scene.update()
 
 
     def render(self, output_name, frames, show = [],
